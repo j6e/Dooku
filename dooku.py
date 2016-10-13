@@ -25,10 +25,9 @@ def crop2(slides):
     """Perform a crop into a 2x1 slides page."""
     width = slides.width
     height = slides.height
-    #print(width - 20, height)
     l_images = []
-    l_images.append(slides[20:width-20, 20:height // 2])
-    l_images.append(slides[20:width-20, height // 2: height - 20])
+    l_images.append(slides[20:width - 20, 20:height // 2])
+    l_images.append(slides[20:width - 20, height // 2: height - 20])
     return l_images
 
 
@@ -46,11 +45,11 @@ def pdfToImg(path, img_path, crop_type):
     for i, page in enumerate(imgs.sequence):
         with Image(page) as page_image:
             page_image.alpha_channel = False  # Disable transparency
-            images = crop(page_image, crop_type) #croping the slides
-            for j, image in zip(range(1, crop_type+1), images):
-                i_index = str(i+1).zfill(3)
+            images = crop(page_image, crop_type)  # croping the slides
+            for j, image in zip(range(1, crop_type + 1), images):
+                i_index = str(i + 1).zfill(3)
                 j_index = str(j).zfill(3)
-                sufix = i_index+ "-" + j_index + ".png"
+                sufix = i_index + "-" + j_index + ".png"
                 image.save(filename=img_path + sufix)
                 clrs = PILImage.open(img_path + sufix).getcolors()
                 if clrs is not None and len(clrs) == 1:  # only one color image
@@ -78,9 +77,9 @@ def main():
         description="Convert a PDF with n x m slides into a PDF with one slide per page.")
     parser.add_argument("file_name", type=str,
                         help="Single file to convert.", nargs="?")
-    parser.add_argument(
-        "--all", help="Reshape every PDF file in this directory.", action="store_true")
-    parser.add_argument("-crop", type=int, choices="24",
+    parser.add_argument("--all",
+        help="Reshape every PDF file in this directory.", action="store_true")
+    parser.add_argument("-crop", type=int, choices=[2, 4],
                         help="Crop mode: 2 (2x1) or 4 (2x2).    (Default: 4)", default=4)
 
     try:
@@ -101,14 +100,14 @@ def main():
         dirname = file.strip(".pdf")
         try:
             os.mkdir(dirname)
-        except FileExistsError: #harsh but works :)
-            shutil.rmtree(os.path.abspath(dirname))
+        except FileExistsError:  # harsh but works :)
+            shutil.rmtree(os.path.abspath(dirname), ignore_errors=True)
             os.mkdir(dirname)
         img_path = os.path.abspath(dirname + "/page-")
         pdfToImg(path, img_path, args.crop)
         imgToPDF(dirname)
         shutil.rmtree(os.path.abspath(dirname))
 
+
 if __name__ == "__main__":
     main()
-    
