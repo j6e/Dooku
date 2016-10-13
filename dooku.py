@@ -48,7 +48,9 @@ def pdfToImg(path, img_path, crop_type):
             page_image.alpha_channel = False  # Disable transparency
             images = crop(page_image, crop_type) #croping the slides
             for j, image in zip(range(1, crop_type+1), images):
-                sufix = "%s%s.png" % (i + 1, j)
+                i_index = str(i+1).zfill(3)
+                j_index = str(j).zfill(3)
+                sufix = i_index+ "-" + j_index + ".png"
                 image.save(filename=img_path + sufix)
                 clrs = PILImage.open(img_path + sufix).getcolors()
                 if clrs is not None and len(clrs) == 1:  # only one color image
